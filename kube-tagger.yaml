@@ -50,5 +50,7 @@ spec:
       serviceAccountName: kube-tagger
       containers:
       - name: kube-tagger
-        image: sergrua/kube-tagger:latest
-        command: ["/app/main"]
+        image: gdisdevops/kube-tagger:latest
+        args:
+          - --default-tag key=value
+          - --default-tag key2=value2

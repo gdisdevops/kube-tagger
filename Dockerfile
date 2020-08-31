@@ -1,17 +1,16 @@
-FROM golang:1.13.1-buster as builder
+FROM golang:1.13-alpine as builder
 
-RUN mkdir -p $GOPATH/src/github.com/sergiorua/kube-tagger
-ADD . $GOPATH/src/github.com/sergiorua/kube-tagger
-WORKDIR $GOPATH/src/github.com/sergiorua/kube-tagger
+ARG RELEASE_VERSION=development
 
-RUN GO111MODULE=on go build main.go && ls -l && echo $GOPATH
+# Install our build tools
+RUN apk add --update git make bash ca-certificates
 
-FROM debian:buster as ca-store
-RUN apt-get update && apt-get install -y ca-certificates
+WORKDIR /go/src/github.com/gdisdevops/kube-tagger
+COPY . ./
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-X 'main.Version=${RELEASE_VERSION}'" -o bin/kube-tagger-linux-amd64 ./cmd/kube-tagger/...
 
-FROM debian:buster
-RUN mkdir /app
-COPY --from=builder /go/src/github.com/sergiorua/kube-tagger/main /app/
-COPY --from=ca-store /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-WORKDIR /app
-CMD ["./main"]
+FROM scratch
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /go/src/github.com/gdisdevops/kube-tagger/bin/kube-tagger-linux-amd64 /kube-tagger
+
+ENTRYPOINT ["/kube-tagger"]

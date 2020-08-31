@@ -1,5 +1,7 @@
 # Kubernetes Volume Tagger
 
+Forked from https://github.com/sergiorua/kube-tagger!
+
 ## What?
 
 It's a simple pod that checks if AWS EBS volumes created by K8s have the AWS tags required.
