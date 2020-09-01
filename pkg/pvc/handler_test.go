@@ -25,7 +25,7 @@ var vol = &v1.PersistentVolume{
 	Spec: v1.PersistentVolumeSpec{
 		PersistentVolumeSource: v1.PersistentVolumeSource{
 			AWSElasticBlockStore: &v1.AWSElasticBlockStoreVolumeSource{
-				VolumeID: "123",
+				VolumeID: "aws://eu-central-1c/vol-06c8c738cdfc1703c",
 			},
 		},
 	},
@@ -71,8 +71,8 @@ func TestHandlerShouldUseDefaultTags(t *testing.T) {
 	}
 
 	tHandle.On("Handle", mock.MatchedBy(func(volId string) bool {
-		if volId != "123" {
-			t.Errorf("Expected volId to be '123' but was '%s'", volId)
+		if volId != "vol-06c8c738cdfc1703c" {
+			t.Errorf("Expected volId to be 'vol-06c8c738cdfc1703c' but was '%s'", volId)
 		}
 		return true
 	}), mock.MatchedBy(func(tags map[string]string) bool {

@@ -7,6 +7,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"regexp"
 	"strings"
 )
 
@@ -59,7 +60,12 @@ func (h HandlerCaller) receiveVolumeId(volumeName string) (*string, error) {
 	}
 
 	if awsVolume.Spec.PersistentVolumeSource.AWSElasticBlockStore != nil {
-		return &awsVolume.Spec.PersistentVolumeSource.AWSElasticBlockStore.VolumeID, nil
+		volTag := awsVolume.Spec.PersistentVolumeSource.AWSElasticBlockStore.VolumeID
+		r, _ := regexp.Compile(".*?:[\\/]{2,3}.*?\\/(.*)$")
+		matches := r.FindStringSubmatch(volTag)
+		if matches != nil && len(matches) == 2 {
+			return &matches[1], nil
+		}
 	}
 
 	return nil, fmt.Errorf("couldn't find VolumeId for persistent volume, %s", volumeName)
