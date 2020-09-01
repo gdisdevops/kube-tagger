@@ -16,7 +16,7 @@ type PVCController struct {
 func NewPVCController(client kubernetes.Interface, handler IHandler, defaultTags map[string]string) (*PVCController, error) {
 	pvcListWatcher := cache.NewListWatchFromClient(
 		client.CoreV1().RESTClient(),
-		"persistentvolumeclaim",
+		"persistentVolumeClaims",
 		v1.NamespaceAll,
 		fields.Everything(),
 	)
